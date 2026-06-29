@@ -1,0 +1,12 @@
+# Ignore local environment files and data
+wp-data/
+models/
+__pycache__/
+.env
+
+# Ignore build artifacts and node dependencies
+local-llm/node_modules/
+local-llm/build/
+
+# Ignore system files
+.DS_Store

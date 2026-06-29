@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<style>
+/* Add this to your index.html <style> tag */
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+#chat-box {
+    flex: 1; /* Pushes the chat box to take all available space */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+.input-area {
+    display: flex;
+    padding: 10px;
+    background: #f9f9f9;
+}
+</style>
+<script>
+	let currentPostContext = "";
+
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'SYNC_CONTENT') {
+        currentPostContext = event.data.content;
+        console.log('Context updated!');
+    }
+});
+
+// Update your sendMessage function to include the context
+async function sendMessage() {
+    // ... existing logic ...
+    const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            message: input,
+            context: currentPostContext // Send the post content with every message
+        })
+    });
+    // ...
+}
+</script>
+<body>
+    <div id="chat-box"></div>
+
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Ask something..." style="flex:1;">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const input = inputField.value;
+
+            if(!input) return; // Basic check
+
+            chatBox.innerHTML += `<p><b>You:</b> ${input}</p>`;
+            inputField.value = ''; // Clear input
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: input})
+            });
+            const data = await response.json();
+            chatBox.innerHTML += `<p><b>AI:</b> ${data.response}</p>`;
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+        }
+    </script>
+</body>
+</html>
